@@ -1,0 +1,51 @@
+[
+  {
+    "amount": 100.0,
+    "date": "02-02-2023",
+    "category": "food",
+    "type": "expense",
+    "description": "brunch"
+  },
+  {
+    "amount": 10,
+    "date": "2025-08-30",
+    "category": "hobby",
+    "type": "expense",
+    "description": "tennis"
+  },
+  {
+    "amount": 20,
+    "date": "2025-11-30",
+    "category": "food",
+    "type": "expense",
+    "description": "lunch"
+  },
+  {
+    "amount": 300,
+    "date": "2025-09-30",
+    "category": "salary",
+    "type": "income",
+    "description": "salary"
+  },
+  {
+    "amount": 40,
+    "date": "2025-08-10",
+    "category": "food",
+    "type": "expense",
+    "description": "breakfast"
+  },
+  {
+    "amount": 30,
+    "date": "2025-12-30",
+    "category": "food",
+    "type": "expense",
+    "description": "dinner"
+  },
+  {
+    "amount": 10.0,
+    "date": "23-10-2023",
+    "category": "paypal",
+    "type": "income",
+    "description": "friend"
+  }
+]
