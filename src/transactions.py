@@ -1,3 +1,5 @@
+import json
+
 transaction = {
     "amount": 10,
     "date": "2025-08-30",
@@ -41,9 +43,6 @@ transactions.append({
 })
 
 
-
-import json
-
 # transactions = [
 #     {"amount": 500, "date": "2025-11-30", "category": "salary", "type": "income", "description": "paycheck"},
 #     {"amount": 20, "date": "2025-11-30", "category": "food", "type": "expense", "description": "lunch"},
@@ -55,8 +54,6 @@ with open("data.json", "w") as f:
     json.dump(transactions, f, indent=2)
 
 print("Transactions saved!")
-
-import json
 
 # Load from file
 with open("data.json", "r") as f:
