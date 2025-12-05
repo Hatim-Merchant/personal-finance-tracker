@@ -26,7 +26,7 @@ def add_transactions(transactions):
     amount = float(input("\nAmount: "))
     date = input("\nDate: ")
     category = input("\nCategory: ")
-    type = input("Type(income or expense): ")
+    type = input("\nType(income or expense): ")
     description = input("\nDescription: ")
 
     transaction = {
@@ -40,6 +40,29 @@ def add_transactions(transactions):
     transactions.append(transaction)
     print("Transaction Added!")
 
+#Implementing transaction lisiting function
+
+def list_transactions(transactions):
+    print("\n--- All Transactions ---")
+
+    if not transactions:
+        print("No transactions found.")
+        return
+
+    print("#  Date         Type      Category     Amount     Description")
+    print("-" * 70)
+
+    for i, t in enumerate(transactions, start=1):
+        print(
+            f"{i:<3}"
+            f"{t['date']:<12}"
+            f"{t['type']:<10}"
+            f"{t['category']:<12}"
+            f"{t['amount']:<10}"
+            f"{t.get('description', '')}"
+        )
+
+
 #Main Menu
 def main():
     transactions = load_transaction()
@@ -50,12 +73,12 @@ def main():
         print("2. List Transactions")
         print ("3. Exit")
 
-        choice = input("\nSelect from Menu:")
+        choice = input("\nSelect from Menu: ")
 
         if choice == "1":
             add_transactions(transactions)
         elif choice == "2":
-            print("\nShowing transactions..")
+            list_transactions(transactions)
         elif choice == "3":
             print("\nExiting")
             save_transaction(transactions)

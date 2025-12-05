@@ -47,5 +47,12 @@
     "category": "paypal",
     "type": "income",
     "description": "friend"
+  },
+  {
+    "amount": 80.0,
+    "date": "2025-10-12",
+    "category": "gift",
+    "type": "expense",
+    "description": "xmas"
   }
 ]

@@ -43,12 +43,6 @@ transactions.append({
 })
 
 
-# transactions = [
-#     {"amount": 500, "date": "2025-11-30", "category": "salary", "type": "income", "description": "paycheck"},
-#     {"amount": 20, "date": "2025-11-30", "category": "food", "type": "expense", "description": "lunch"},
-#     {"amount": 50, "date": "2025-11-29", "category": "transport", "type": "expense", "description": "bus ticket"}
-# ]
-
 # Save to a file
 with open("data.json", "w") as f:
     json.dump(transactions, f, indent=2)
@@ -62,3 +56,4 @@ with open("data.json", "r") as f:
 # Print each transaction
 for t in loaded_transactions:
     print(t["date"], t["category"], t["amount"])
+
