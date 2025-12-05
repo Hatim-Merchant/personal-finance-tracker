@@ -2,3 +2,36 @@ __pycache__/
 *.pyc
 .venv/
 data.json
+
+# Python bytecode files
+*.pyc
+__pycache__/
+
+# Virtual environment directories
+.venv/
+env/
+venv/
+
+# Python egg-info
+*.egg-info/
+
+# Environment file for secrets
+.env
+
+# Log files
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+
+# macOS specific files
+.DS_Store
+
+# Backup or temp files
+*.swp
+*.bak
+*.tmp
+
+# Dependency lock files (optional, based on your workflow)
+uv.lock
