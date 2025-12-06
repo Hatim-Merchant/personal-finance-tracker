@@ -61,7 +61,22 @@ def list_transactions(transactions):
             f"{t['amount']:<10}"
             f"{t.get('description', '')}"
         )
+#Implementing summary function
+def show_summary(transactions):
+    income = 0
+    expense = 0
+    for t in transactions:
+        if t['type'] == 'income':
+            income += t['amount']
+        elif t['type'] == 'expense':
+            expense += t['amount']
+        balance = income - expense
 
+    print("\n--- Summary---")
+    print(f"Total Income: {income}")
+    print(f"Total Expense: {expense}")
+    print(f"Balance: {balance}")
+    
 
 #Main Menu
 def main():
@@ -71,7 +86,9 @@ def main():
         print("\n---Personal Finance Tracker---\n")
         print("1. Add")
         print("2. List Transactions")
-        print ("3. Exit")
+        print("3. Show Summary")
+        print("4. Exit")
+        
 
         choice = input("\nSelect from Menu: ")
 
@@ -79,7 +96,9 @@ def main():
             add_transactions(transactions)
         elif choice == "2":
             list_transactions(transactions)
-        elif choice == "3":
+        elif choice =="3":
+            show_summary(transactions)
+        elif choice == "4":
             print("\nExiting")
             save_transaction(transactions)
             break
