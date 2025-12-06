@@ -38,6 +38,6 @@ uv.lock
 
 # Data files
 *.json
-data/.gitkeep
+!data/.gitkeep
 
 
