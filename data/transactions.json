@@ -54,5 +54,19 @@
     "category": "gift",
     "type": "expense",
     "description": "xmas"
+  },
+  {
+    "amount": 500.0,
+    "date": "2025-10-10",
+    "category": "salary",
+    "type": "income",
+    "description": "october"
+  },
+  {
+    "amount": 20.0,
+    "date": "2025-10-12",
+    "category": "hobby",
+    "type": "expense",
+    "description": "xbox"
   }
 ]
