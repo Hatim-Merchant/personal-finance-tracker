@@ -98,8 +98,14 @@ def show_summary(transactions):
         income_by_category = {}
         expense_by_category = {}
         found = False
-        month = input("\nEnter month to view (YYYY-MM): ")
-
+        while True:
+            month = input("\nEnter month to view (YYYY-MM): ")
+            try:
+                # Try parsing the month
+                dt.strptime(month, "%Y-%m")
+                break  # valid format
+            except ValueError:
+                print("Invalid month format. Please use YYYY-MM")
 
         for t in transactions:
             if not t["date"].startswith(month):
