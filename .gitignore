@@ -39,5 +39,8 @@ uv.lock
 # Data files
 *.json
 !data/.gitkeep
-
-
+# Database files
+db/*.db
+*.sqlite
+*.sqlite3ß
+*.csv
