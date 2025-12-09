@@ -188,6 +188,32 @@ def set_budget(budgets):
     save_budgets(budgets)
     print(f"Budget for {category} set to {amount}")
 
+#Implementing search function
+def search_transactions(transactions, query):
+    q = query.strip().lower()
+    matches = []
+
+    for t in transactions:
+        amount = str(t.get("amount", "")).lower()
+        category = t.get("category", "").lower()
+        date = t.get("date", "").lower()
+        type = t.get("type", "").lower()
+        desc = t.get("description", "").lower()
+
+        if (q in amount) or (q in category) or (q in date) or (q in type) or (q in desc):
+            matches.append(t)
+
+    if not matches:
+        print("No transactions found.")
+        return
+    
+    print(f"Found {len(matches)} Transaction(s):")
+    for i, m in enumerate(matches, start=1):
+        print(
+            f"{i}. {m.get('date','')} | {m.get('type','')} | "
+            f"{m.get('category','')} | {m.get('amount','')} | {m.get('description','')}"
+        )
+        
 #Main Menu
 def main():
     transactions = load_transaction()
@@ -199,7 +225,8 @@ def main():
         print("2. List Transactions")
         print("3. Show Summary")
         print("4. Edit Budget Limit")
-        print("5. Exit")
+        print("5. Search Transactions")
+        print("6. Exit")
         
 
         choice = input("\nSelect from Menu: ")
@@ -213,6 +240,9 @@ def main():
         elif choice == "4":
             set_budget(budgets)
         elif choice == "5":
+            query = input("Search: ")
+            search_transactions(transactions, query)
+        elif choice == "6":
             print("\nExiting")
             save_transaction(transactions)
             break
