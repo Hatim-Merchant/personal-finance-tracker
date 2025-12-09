@@ -5,6 +5,7 @@ from datetime import datetime as dt
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "..", "data")
 DATA_FILE = os.path.join(DATA_DIR, "transactions.json")
+BUDGET_FILE = os.path.join(DATA_DIR, "budget.json")
 
 #Loading data file
 def load_transaction():
@@ -12,17 +13,33 @@ def load_transaction():
         return[]
     with open (DATA_FILE, "r") as f:
         return json.load(f)
-    
 #saving transactions to data file
 def save_transaction(transactions):
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
-
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(transactions, f, indent=2)
+
+#loading budget file
+def load_budgets():
+    if not os.path.exists(BUDGET_FILE):
+        return {}
+    try:
+        with open(BUDGET_FILE, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print("22")
+        return {}    
+
+#saving budget to data file
+def save_budgets(budgets):
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+    with open(BUDGET_FILE, "w", encoding="utf-8") as f:
+        json.dump(budgets, f, indent=2)
         
 #Implementing transaction adding function
-def add_transactions(transactions):
+def add_transactions(transactions, budgets):
 
     print("\n---Add Transaction---\n")
 
@@ -50,6 +67,10 @@ def add_transactions(transactions):
 
     transactions.append(transaction)
     print("Transaction Added!")
+
+    if type == "expense" and category in budgets:
+        if amount > budgets[category]:
+            print(f"Warning: Budget limit exceeded for {category}!")
     
 #Implementing transaction lisiting function
 def list_transactions(transactions):
@@ -101,9 +122,9 @@ def show_summary(transactions):
         while True:
             month = input("\nEnter month to view (YYYY-MM): ")
             try:
-                # Try parsing the month
+                #validating month format
                 dt.strptime(month, "%Y-%m")
-                break  # valid format
+                break 
             except ValueError:
                 print("Invalid month format. Please use YYYY-MM")
 
@@ -130,13 +151,18 @@ def show_summary(transactions):
         print("\n--- Monthly Summary ---")
 
         print("\nIncome by Category:")
-        for category, amount in income_by_category.items():
-            print(f"{category}: {amount}")
+        for category, amount in sorted(income_by_category.items(), key=lambda x: x[1], reverse=True):
+            percent = (amount / total_income) * 100 if total_income > 0 else 0
+            print(f"{category}: {amount} ({percent:.1f}%)")
+
+
         print("Total Income:",total_income)
 
         print("\nExpense by Category:")
-        for category, amount in expense_by_category.items():
-            print(f"{category}: {amount}")
+        for category, amount in sorted(expense_by_category.items(), key=lambda x: x[1], reverse=True):
+            percent = (amount / total_expense) * 100 if total_expense > 0 else 0
+            print(f"{category}: {amount} ({percent:.1f}%)")
+
         print("Total Expense:", total_expense)
         
         print(f"\nFinal Balance of {month} is: {balance}")
@@ -146,27 +172,39 @@ def show_summary(transactions):
     else:
         print("Invalid option. Try again")
 
+#Implementing budget setting function
+def set_budget(budgets):
+    category = input("\nCategory: ")
+    amount = float(input("\nBudget Limit: "))
+    budgets[category] = amount
+    save_budgets(budgets)
+    print(f"Budget for {category} set to {amount}")
+
 #Main Menu
 def main():
     transactions = load_transaction()
+    budgets = load_budgets()
 
     while True:
         print("\n---Personal Finance Tracker---\n")
         print("1. Add")
         print("2. List Transactions")
         print("3. Show Summary")
-        print("4. Exit")
+        print("4. Edit Budget Limit")
+        print("5. Exit")
         
 
         choice = input("\nSelect from Menu: ")
 
         if choice == "1":
-            add_transactions(transactions)
+            add_transactions(transactions, budgets)
         elif choice == "2":
             list_transactions(transactions)
         elif choice =="3":
             show_summary(transactions)
         elif choice == "4":
+            set_budget(budgets)
+        elif choice == "5":
             print("\nExiting")
             save_transaction(transactions)
             break
