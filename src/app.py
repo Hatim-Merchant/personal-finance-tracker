@@ -68,10 +68,18 @@ def add_transactions(transactions, budgets):
     transactions.append(transaction)
     print("Transaction Added!")
 
-    if type == "expense" and category in budgets:
-        if amount > budgets[category]:
-            print(f"Warning: Budget limit exceeded for {category}!")
-    
+#budget checking
+    month = date[:7]
+
+    total_expense = 0
+    for t in transactions:
+        if type == "expense" and category in budgets:
+            if t["date"].startswith(month):
+                total_expense += t["amount"]
+
+    if category in budgets and total_expense > budgets[category]:
+        print(f"Warning: Budget limit exceeded for {category}!")
+
 #Implementing transaction lisiting function
 def list_transactions(transactions):
     print("\n--- All Transactions ---")
