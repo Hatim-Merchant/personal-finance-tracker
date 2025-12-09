@@ -1,11 +1,27 @@
 import json
 import os
 from datetime import datetime as dt
+import csv
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "..", "data")
 DATA_FILE = os.path.join(DATA_DIR, "transactions.json")
 BUDGET_FILE = os.path.join(DATA_DIR, "budget.json")
+
+EXPORT_DIR = os.path.join(BASE_DIR, "..", "exports")
+
+if not os.path.exists(EXPORT_DIR):
+    os.makedirs(EXPORT_DIR)
+
+#exporting to CSV
+def export_csv(transactions, filename="transactions.csv"):
+    csv_path = os.path.join(EXPORT_DIR, filename)
+    with open (csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, "amount,date,category,type,description".split(","))
+        writer.writeheader()
+        writer.writerows(transactions)
+        print(f"CSV saved → {csv_path}")
+
 
 #Loading data file
 def load_transaction():
@@ -226,7 +242,8 @@ def main():
         print("3. Show Summary")
         print("4. Edit Budget Limit")
         print("5. Search Transactions")
-        print("6. Exit")
+        print("6. Export Data to CSV")
+        print("7. Exit")
         
 
         choice = input("\nSelect from Menu: ")
@@ -243,6 +260,9 @@ def main():
             query = input("Search: ")
             search_transactions(transactions, query)
         elif choice == "6":
+            export_csv(transactions)
+            print("Data exported to CSV file.")
+        elif choice == "7":
             print("\nExiting")
             save_transaction(transactions)
             break
