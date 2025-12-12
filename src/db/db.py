@@ -37,25 +37,50 @@ def fetch_transactions():
 
 #monthly summary function
 def get_monthly_summary(month):
-    connection = get_connection()
-    cursor = connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT type, category, sum(amount) FROM transactions
+        SELECT type, category, SUM(amount)
+        FROM transactions
         WHERE date LIKE ?
         GROUP BY type, category;
     """, (f"{month}-%",))
 
     rows = cursor.fetchall()
-    connection.close()
+    conn.close()
 
     income_cat = {}
     expense_cat = {}
 
-    for r in rows:
-        t_type, category, total = r
+    for t_type, category, total in rows:
         if t_type == "income":
             income_cat[category] = total
         else:
             expense_cat[category] = total
-    return income_cat, expense_cat               
+
+    return income_cat, expense_cat
+
+def get_simple_summary():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT type, SUM(amount)
+        FROM transactions
+        GROUP BY type;
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    income = 0
+    expense = 0
+
+    for t_type, total in rows:
+        if t_type == "income":
+            income = total
+        else:
+            expense = total
+    
+    return income, expense

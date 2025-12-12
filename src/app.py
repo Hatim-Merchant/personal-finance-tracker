@@ -4,7 +4,7 @@ from datetime import datetime as dt
 import csv
 from secrets import choice
 import sqlite3
-from db.db import get_monthly_summary, insert_transaction, fetch_transactions
+from db.db import get_monthly_summary, insert_transaction, fetch_transactions, get_simple_summary
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "..", "data")
@@ -61,28 +61,17 @@ def save_budgets(budgets):
 def add_transactions(transactions, budgets):
 
     print("\n---Add Transaction---\n")
-
     amount = float(input("\nAmount: "))
-
-    while True:
-        date = input("\nDate (YYYY-MM-DD): ")
-        try:
-            date_obj = dt.strptime(date, "%Y-%m-%d")
-            break
-        except ValueError:
-            print("Invalid date format. Please use YYYY-MM-DD")
+    date = input("\nDate (YYYY-MM-DD): ")
+    #     try:
+    #         date_obj = dt.strptime(date, "%Y-%m-%d")
+    #         break
+    #     except ValueError:
+    #         print("Invalid date format. Please use YYYY-MM-DD")
 
     category = input("\nCategory: ")
-    type = input("\nType(income or expense): ")
+    type = input("\nType(income or expense): ").lower()
     description = input("\nDescription: ")
-
-    transaction = {
-        "amount":amount, 
-        "date":date,
-        "category":category,
-        "type":type,
-        "description":description
-    }
 
     insert_transaction(amount, date, category, type, description)
     print("Transaction saved to database!")
@@ -100,14 +89,14 @@ def add_transactions(transactions, budgets):
         print(f"Warning: Budget limit exceeded for {category}!")
 
 #Implementing transaction lisiting function
-def list_transactions(transactions):
-    print("\n--- All Transactions ---")
+def list_transactions():
+    transactions = fetch_transactions()
 
     if not transactions:
-        print("No transactions found.")
+        print("\nNo transactions found.")
         return
 
-    print("#  Date         Type      Category     Amount     Description")
+    print("\n#  Date        Type      Category     Amount     Description")
     print("-" * 70)
 
     for i, t in enumerate(transactions, start=1):
@@ -122,105 +111,37 @@ def list_transactions(transactions):
 #Implementing summary function
 def show_summary(transactions):
     print("\n1. Simple Summary")
-    print("\n2. Monthly Summary")
-    print("\n3. Previous Menu")
+    print("2. Monthly Summary")
+    print("3. Previous Menu")
 
     choice = input("\nSelect Summary Type: ")
-    #Simple summary calculating total income, expense and balance
+
     if choice == "1":
-        income = 0
-        expense = 0
-        for t in transactions:
-            if t['type'] == 'income':
-                income += t['amount']
-            elif t['type'] == 'expense':
-                expense += t['amount']
+        income, expense = get_simple_summary()
         balance = income - expense
 
-        print("\n--- Summary---")
-        print(f"Total Income: {income}")
-        print(f"Total Expense: {expense}")
-        print(f"Balance: {balance}")
-    
+        print("\n--- Summary ---")
+        print("Total Income:", income)
+        print("Total Expense:", expense)
+        print("Balance:", balance)
+
     elif choice == "2":
         month = input("Enter month (YYYY-MM): ")
         income_cat, expense_cat = get_monthly_summary(month)
 
         if not income_cat and not expense_cat:
-            print(f"\nNo transactions found for {month}")
+            print("No transactions for this month.")
             return
+        
         print("\n--- Monthly Summary ---")
+        print("Income by Category:")
+        for cat, amt in income_cat.items():
+            print(f"{cat}: {amt}")
 
-        print("\nIncome by Category:")
-        for category, amount in income_cat.items():
-            print(f"{category}: {amount}")
-        
         print("\nExpense by Category:")
-        for category, amount in expense_cat.items():
-            print(f"{category}: {amount}")
-        
-        total_income = sum(income_cat.values())
-        total_expense = sum(expense_cat.values())
-        balance = total_income - total_expense
+        for cat, amt in expense_cat.items():
+            print(f"{cat}: {amt}")
 
-        print("Total Income:", total_income)
-        print("Total Expense:", total_expense)
-        print(f"\nFinal Balance of {month} is: {balance}")
-        
-    # elif choice == "2":
-    #     income_by_category = {}
-    #     expense_by_category = {}
-    #     found = False
-    #     while True:
-    #         month = input("\nEnter month to view (YYYY-MM): ")
-    #         try:
-    #             #validating month format
-    #             dt.strptime(month, "%Y-%m")
-    #             break 
-    #         except ValueError:
-    #             print("Invalid month format. Please use YYYY-MM")
-
-    #     for t in transactions:
-    #         if not t["date"].startswith(month):
-    #             continue
-
-    #         found = True
-    #         category = t["category"]
-    #         amount = t["amount"]
-
-    #         if t["type"] == "income":
-    #             income_by_category[category] = income_by_category.get(category, 0) + amount
-    #         else:
-    #             expense_by_category[category] = expense_by_category.get(category, 0) + amount
-    #     if not found:
-    #         print(f"\nNo transactions found for {month}")
-    #         return
-        
-    #     total_income = sum(income_by_category.values())
-    #     total_expense = sum(expense_by_category.values())
-    #     balance = total_income - total_expense
-
-    #     print("\n--- Monthly Summary ---")
-
-    # #     print("\nIncome by Category:")
-    # #     for category, amount in sorted(income_by_category.items(), key=lambda x: x[1], reverse=True):
-    # #         percent = (amount / total_income) * 100 if total_income > 0 else 0
-    # #         print(f"{category}: {amount} ({percent:.1f}%)")
-
-
-    # #     print("Total Income:",total_income)
-
-    # #     print("\nExpense by Category:")
-    # #     for category, amount in sorted(expense_by_category.items(), key=lambda x: x[1], reverse=True):
-    # #         percent = (amount / total_expense) * 100 if total_expense > 0 else 0
-    # #         print(f"{category}: {amount} ({percent:.1f}%)")
-
-    # #     print("Total Expense:", total_expense)
-        
-    # #     print(f"\nFinal Balance of {month} is: {balance}")
-    # if choice == "2":  # monthly summary
-    #     month = input("Enter month (YYYY-MM): ")
-    #     income_cat, expense_cat = get_monthly_summary(month)
     elif choice == "3":
         return
     else:
@@ -267,7 +188,7 @@ def main():
 
     while True:
         print("\n---Personal Finance Tracker---\n")
-        print("1. Add")
+        print("1. Add Transaction")
         print("2. Show Summary")
         print("3. List Transactions")
         print("4. Edit Budget Limit")
@@ -281,7 +202,7 @@ def main():
         if choice == "1":
             add_transactions(transactions, budgets)
         elif choice == "3":
-            list_transactions(transactions)
+            list_transactions()
         elif choice =="2":
             show_summary(transactions)
         elif choice == "4":
