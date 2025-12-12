@@ -1,9 +1,6 @@
 import json
 import os
-from datetime import datetime as dt
 import csv
-from secrets import choice
-import sqlite3
 from db.db import get_monthly_summary, insert_transaction, fetch_transactions, get_simple_summary, get_transactions
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

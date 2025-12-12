@@ -85,7 +85,7 @@ def get_simple_summary():
     
     return income, expense
 
-def get_transactions(category, type):
+def get_transactions(category, type, min_amt, max_amt, start_date, end_date):
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -94,11 +94,24 @@ def get_transactions(category, type):
 
     if category:
         sql += " AND category LIKE ?"
-        params.append(f"%{category}%")  # allows partial match
+        params.append(f"%{category}%") 
 
     if type:
         sql += " AND type = ?"
-        params.append(type.lower())  # always lowercase for safety
+        params.append(type.lower())  
+
+    if min_amt:
+        sql += " AND amount >= ?"
+        params.append(min_amt)
+    if max_amt:
+        sql += " AND amt <= ?"
+        params.append(max_amt)
+    if start_date:
+        sql += " AND date >= ?"
+        params.append(start_date)
+    if end_date:
+        sql += " AND date <= ?"
+        params.append(end_date)
 
     sql += " ORDER BY date;"
 

@@ -49,3 +49,18 @@ def monthly_summary(month: str):
         "Income: ": income_cat,
         "Expense:": expense_cat
     }
+
+@app.get("/transactions/search/")
+def search_transactions(category: Optional[str] = None, 
+                        type: Optional[str] = None, 
+                        min_amt: Optional[float] = None, 
+                        max_amt: Optional[float] = None, 
+                        start_date: Optional[str] = None, 
+                        end_date: Optional[str] = None):
+    transactions = get_transactions(category=category, 
+                                    type=type, 
+                                    min_amt=min_amt, 
+                                    max_amt=max_amt, 
+                                    start_date=start_date, 
+                                    end_date=end_date)
+    return transactions
