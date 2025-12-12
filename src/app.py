@@ -4,7 +4,7 @@ from datetime import datetime as dt
 import csv
 from secrets import choice
 import sqlite3
-from db.db import get_monthly_summary, insert_transaction, fetch_transactions, get_simple_summary
+from db.db import get_monthly_summary, insert_transaction, fetch_transactions, get_simple_summary, get_transactions
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "..", "data")
@@ -63,12 +63,6 @@ def add_transactions(transactions, budgets):
     print("\n---Add Transaction---\n")
     amount = float(input("\nAmount: "))
     date = input("\nDate (YYYY-MM-DD): ")
-    #     try:
-    #         date_obj = dt.strptime(date, "%Y-%m-%d")
-    #         break
-    #     except ValueError:
-    #         print("Invalid date format. Please use YYYY-MM-DD")
-
     category = input("\nCategory: ")
     type = input("\nType(income or expense): ").lower()
     description = input("\nDescription: ")
@@ -78,7 +72,6 @@ def add_transactions(transactions, budgets):
 
 #budget checking
     month = date[:7]
-
     total_expense = 0
     for t in transactions:
         if type == "expense" and category in budgets:
@@ -91,7 +84,6 @@ def add_transactions(transactions, budgets):
 #Implementing transaction lisiting function
 def list_transactions():
     transactions = fetch_transactions()
-
     if not transactions:
         print("\nNo transactions found.")
         return
@@ -109,7 +101,7 @@ def list_transactions():
             f"{t.get('description', '')}"
         )
 #Implementing summary function
-def show_summary(transactions):
+def show_summary():
     print("\n1. Simple Summary")
     print("2. Monthly Summary")
     print("3. Previous Menu")
@@ -155,32 +147,45 @@ def set_budget(budgets):
     save_budgets(budgets)
     print(f"Budget for {category} set to {amount}")
 
-#Implementing search function
-def search_transactions(transactions, query):
-    q = query.strip().lower()
-    matches = []
+#implementing transaction search function
+def search_transactions():
+        category = input("Search by category (leave blank to skip): ")
+        type = input("Search by type (income/expense, leave blank to skip): ")
 
-    for t in transactions:
-        amount = str(t.get("amount", "")).lower()
-        category = t.get("category", "").lower()
-        date = t.get("date", "").lower()
-        type = t.get("type", "").lower()
-        desc = t.get("description", "").lower()
+        results = get_transactions(category, type)       
+        if not results:
+            print("\nNo transactions found.")
+            return
 
-        if (q in amount) or (q in category) or (q in date) or (q in type) or (q in desc):
-            matches.append(t)
+        print("\n#  Date        Type      Category     Amount     Description")
+        print("-" * 70)
+        for i, t in enumerate(results, start=1):
+            print(
+                f"{i:<3}"
+                f"{t['date']:<12}"
+                f"{t['type']:<10}"
+                f"{t['category']:<12}"
+                f"{t['amount']:<10}"
+                f"{t.get('description','')}"
+            )
+#Implementing data export function
+def export_data():
+    if not os.path.exists(EXPORT_DIR):
+        os.makedirs(EXPORT_DIR)
 
-    if not matches:
-        print("No transactions found.")
+    filepath = os.path.join(EXPORT_DIR, "transactions.csv")
+    transactions = get_transactions()  
+
+    if not transactions:
+        print("No transactions to export.")
         return
-    
-    print(f"Found {len(matches)} Transaction(s):")
-    for i, m in enumerate(matches, start=1):
-        print(
-            f"{i}. {m.get('date','')} | {m.get('type','')} | "
-            f"{m.get('category','')} | {m.get('amount','')} | {m.get('description','')}"
-        )
-        
+
+    with open(filepath, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["id", "amount", "date", "category", "type", "description"])
+        writer.writeheader()
+        writer.writerows(transactions)
+
+    print(f"{len(transactions)} transactions exported to {filepath}")
 #Main Menu
 def main():
     transactions = fetch_transactions()
@@ -204,15 +209,13 @@ def main():
         elif choice == "3":
             list_transactions()
         elif choice =="2":
-            show_summary(transactions)
+            show_summary()
         elif choice == "4":
             set_budget(budgets)
         elif choice == "5":
-            query = input("Search: ")
-            search_transactions(transactions, query)
+            search_transactions()
         elif choice == "6":
-            export_csv(transactions)
-            print("Data exported to CSV file.")
+            export_data()
         elif choice == "7":
             print("\nExiting")
             save_transaction(transactions)

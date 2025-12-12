@@ -44,3 +44,4 @@ src/db/*.db
 *.sqlite
 *.sqlite3ß
 *.csv
+exports/

@@ -53,8 +53,8 @@ def get_monthly_summary(month):
     income_cat = {}
     expense_cat = {}
 
-    for t_type, category, total in rows:
-        if t_type == "income":
+    for type, category, total in rows:
+        if type == "income":
             income_cat[category] = total
         else:
             expense_cat[category] = total
@@ -77,10 +77,44 @@ def get_simple_summary():
     income = 0
     expense = 0
 
-    for t_type, total in rows:
-        if t_type == "income":
+    for type, total in rows:
+        if type == "income":
             income = total
         else:
             expense = total
     
     return income, expense
+
+def get_transactions(category, type):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    sql = "SELECT id, amount, date, category, type, description FROM transactions WHERE 1=1"
+    params = []
+
+    if category:
+        sql += " AND category LIKE ?"
+        params.append(f"%{category}%")  # allows partial match
+
+    if type:
+        sql += " AND type = ?"
+        params.append(type.lower())  # always lowercase for safety
+
+    sql += " ORDER BY date;"
+
+    cursor.execute(sql, params)
+    rows = cursor.fetchall()
+    connection.close()
+
+    transactions = []
+    for r in rows:
+        transactions.append({
+            "id": r[0],
+            "amount": r[1],
+            "date": r[2],
+            "category": r[3],
+            "type": r[4],
+            "description": r[5]
+        })
+
+    return transactions
