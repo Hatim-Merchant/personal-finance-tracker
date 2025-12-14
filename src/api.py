@@ -4,32 +4,14 @@ from pydantic import BaseModel, Field
 from typing import Optional, Literal
 from fastapi.responses import StreamingResponse
 import io, csv
+from schemas import TransactionCreate
 
 app = FastAPI(title="Finance Tracker")
-
-#pydantic model for input validation
-class Transaction(BaseModel):
-    amount: float = Field(gt=0)
-    date: str
-    category: str
-    type: Literal["income", "expense"]
-    description: Optional[str] = ""
-
-#adding transaction
-@app.post("/transactions/")
-def add_transactions(transaction: Transaction):
-    insert_transaction(transaction.amount,
-                       transaction.date,
-                       transaction.category,
-                       transaction.type,
-                       transaction.description
-                       )
-    return {"message": "Transaction added successfully"}
 
 #list all transactions
 @app.get("/transactions/")
 def list_transactions(category: Optional[str] = None, type: Optional[str] = None):
-    transactions = fetch_transactions(category, type)
+    transactions = fetch_transactions()
     if not transactions:
         return {"message": "No transactions found"}
     return transactions
@@ -69,7 +51,7 @@ def search_transactions(category: Optional[str] = None,
     return transactions
 
 #export transactions as CSV
-@app.get("/export/csv")
+@app.get("/exports/csv")
 def export_transactions_csv():
     transactions = fetch_transactions()
 
@@ -92,6 +74,14 @@ def export_transactions_csv():
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=transactions.csv"}
     )
-
-
-
+#implementing POST endpoint to add transaction
+@app.post("/transactions/")
+def create_transaction(transaction: TransactionCreate):
+    insert_transaction(
+        transaction.amount,
+        transaction.date,
+        transaction.category,
+        transaction.type,
+        transaction.description
+    )
+    return {"message": "Transaction added successfully"}
