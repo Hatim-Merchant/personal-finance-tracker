@@ -131,3 +131,15 @@ def get_transactions(category, type, min_amt, max_amt, start_date, end_date):
         })
 
     return transactions
+
+#implementing POST transaction (inserting transaction)
+
+def insert_transaction(amount, date, category, type, description):
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("""
+        INSERT INTO transactions (amount, date, category, type, description)
+        VALUES (?, ?, ?, ?, ?);
+    """, (amount, date, category, type, description))
+    connection.commit()
+    connection.close()
