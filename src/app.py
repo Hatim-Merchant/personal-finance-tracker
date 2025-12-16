@@ -1,7 +1,7 @@
 import json
 import os
 import csv
-from db.db import get_monthly_summary, insert_transaction, fetch_transactions, get_simple_summary, get_transactions
+from db.db import get_monthly_summary, insert_transaction, fetch_transactions, get_simple_summary, fetch_transactions
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "..", "data")
@@ -149,7 +149,7 @@ def search_transactions():
         category = input("Search by category (leave blank to skip): ")
         type = input("Search by type (income/expense, leave blank to skip): ")
 
-        results = get_transactions(category, type)       
+        results = fetch_transactions(category=category, t_type=type)       
         if not results:
             print("\nNo transactions found.")
             return
@@ -171,7 +171,7 @@ def export_data():
         os.makedirs(EXPORT_DIR)
 
     filepath = os.path.join(EXPORT_DIR, "transactions.csv")
-    transactions = get_transactions()  
+    transactions = fetch_transactions()  
 
     if not transactions:
         print("No transactions to export.")
@@ -183,6 +183,7 @@ def export_data():
         writer.writerows(transactions)
 
     print(f"{len(transactions)} transactions exported to {filepath}")
+    
 #Main Menu
 def main():
     transactions = fetch_transactions()

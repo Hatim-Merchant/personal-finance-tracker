@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from db.db import insert_transaction, fetch_transactions, get_monthly_summary, get_simple_summary, get_transactions
+from db.db import insert_transaction, fetch_transactions, get_monthly_summary, get_simple_summary, fetch_transactions
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 from fastapi.responses import StreamingResponse
@@ -42,7 +42,7 @@ def search_transactions(category: Optional[str] = None,
                         max_amt: Optional[float] = None, 
                         start_date: Optional[str] = None, 
                         end_date: Optional[str] = None):
-    transactions = get_transactions(category=category, 
+    transactions = fetch_transactions(category=category, 
                                     type=type, 
                                     min_amt=min_amt, 
                                     max_amt=max_amt, 
